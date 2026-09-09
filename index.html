@@ -206,6 +206,7 @@
   .field input:focus, .field select:focus{
     outline:none; border-color:var(--clay);
   }
+  .field input.invalid{ border-color:#e5484d; }
   .btn:focus-visible{
     outline:2px solid var(--clay); outline-offset:2px;
   }
@@ -306,18 +307,7 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       <div class="field">
         <label for="tel" data-i18n="label_phone">Téléphone</label>
         <div class="phone-row">
-          <select id="tel-code" aria-label="Indicatif">
-            <option value="+33" selected>FR +33</option>
-            <option value="+39">IT +39</option>
-            <option value="+44">UK +44</option>
-            <option value="+1">US/CA +1</option>
-            <option value="+34">ES +34</option>
-            <option value="+49">DE +49</option>
-            <option value="+41">CH +41</option>
-            <option value="+32">BE +32</option>
-            <option value="+377">MC +377</option>
-            <option value="+7">RU +7</option>
-          </select>
+          <select id="tel-code" aria-label="Indicatif"></select>
           <input id="tel" type="tel" required>
         </div>
       </div>
@@ -359,6 +349,7 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       submit: "Je veux être informé en premier",
       submitted: "Merci, vous serez parmi les premiers informés.",
       submit_error: "Une erreur est survenue, réessayez.",
+      phone_invalid: "Numéro de téléphone invalide pour l'indicatif sélectionné.",
       privacy: "Politique de confidentialité",
       legal: "Mentions légales"
     },
@@ -376,6 +367,7 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       submit: "I want to be the first to know",
       submitted: "Thank you, you will be among the first to know.",
       submit_error: "Something went wrong, please try again.",
+      phone_invalid: "Invalid phone number for the selected country code.",
       privacy: "Privacy Policy",
       legal: "Legal Information"
     },
@@ -393,6 +385,7 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       submit: "Voglio essere tra i primi a saperlo",
       submitted: "Grazie, sarete tra i primi a saperlo.",
       submit_error: "Si è verificato un errore, riprova.",
+      phone_invalid: "Numero di telefono non valido per l'indicativo selezionato.",
       privacy: "Informativa sulla privacy",
       legal: "Note legali"
     }
@@ -437,6 +430,234 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
   }
   setLanguage(initialLang, false);
 
+  var PHONE_COUNTRIES = [
+    ['France', '33', 9, 9],
+    ['Italie', '39', 6, 11],
+    ['Royaume-Uni', '44', 9, 10],
+    ['États-Unis / Canada', '1', 10, 10],
+    ['Espagne', '34', 9, 9],
+    ['Allemagne', '49', 6, 11],
+    ['Suisse', '41', 9, 9],
+    ['Belgique', '32', 8, 9],
+    ['Monaco', '377', 8, 9],
+    ['Luxembourg', '352', 6, 9],
+    ['Pays-Bas', '31', 9, 9],
+    ['Portugal', '351', 9, 9],
+    ['Irlande', '353', 7, 9],
+    ['Autriche', '43', 7, 13],
+    ['Danemark', '45', 8, 8],
+    ['Suède', '46', 7, 9],
+    ['Norvège', '47', 8, 8],
+    ['Finlande', '358', 6, 10],
+    ['Islande', '354', 7, 7],
+    ['Andorre', '376', 6, 6],
+    ['Saint-Marin', '378', 6, 10],
+    ['Vatican', '379', 6, 10],
+    ['Malte', '356', 8, 8],
+    ['Chypre', '357', 8, 8],
+    ['Grèce', '30', 10, 10],
+    ['Slovénie', '386', 8, 8],
+    ['Croatie', '385', 8, 9],
+    ['Bosnie-Herzégovine', '387', 8, 8],
+    ['Serbie', '381', 8, 9],
+    ['Monténégro', '382', 8, 8],
+    ['Kosovo', '383', 8, 8],
+    ['Macédoine du Nord', '389', 8, 8],
+    ['Albanie', '355', 8, 9],
+    ['Roumanie', '40', 9, 9],
+    ['Bulgarie', '359', 8, 9],
+    ['Hongrie', '36', 8, 9],
+    ['Tchéquie', '420', 9, 9],
+    ['Slovaquie', '421', 9, 9],
+    ['Pologne', '48', 9, 9],
+    ['Lituanie', '370', 8, 8],
+    ['Lettonie', '371', 8, 8],
+    ['Estonie', '372', 7, 8],
+    ['Biélorussie', '375', 9, 9],
+    ['Ukraine', '380', 9, 9],
+    ['Moldavie', '373', 8, 8],
+    ['Russie / Kazakhstan', '7', 10, 10],
+    ['Liechtenstein', '423', 7, 9],
+    ['Turquie', '90', 10, 10],
+    ['Israël', '972', 8, 9],
+    ['Palestine', '970', 8, 9],
+    ['Jordanie', '962', 8, 9],
+    ['Liban', '961', 7, 8],
+    ['Syrie', '963', 8, 9],
+    ['Irak', '964', 8, 10],
+    ['Arabie saoudite', '966', 8, 9],
+    ['Koweït', '965', 7, 8],
+    ['Bahreïn', '973', 8, 8],
+    ['Qatar', '974', 7, 8],
+    ['Émirats arabes unis', '971', 8, 9],
+    ['Oman', '968', 7, 8],
+    ['Yémen', '967', 7, 9],
+    ['Iran', '98', 10, 10],
+    ['Afghanistan', '93', 9, 9],
+    ['Pakistan', '92', 9, 10],
+    ['Inde', '91', 10, 10],
+    ['Bangladesh', '880', 8, 10],
+    ['Sri Lanka', '94', 9, 9],
+    ['Maldives', '960', 7, 7],
+    ['Népal', '977', 9, 10],
+    ['Bhoutan', '975', 7, 8],
+    ['Myanmar', '95', 7, 10],
+    ['Thaïlande', '66', 8, 9],
+    ['Laos', '856', 8, 10],
+    ['Cambodge', '855', 8, 9],
+    ['Vietnam', '84', 9, 10],
+    ['Malaisie', '60', 8, 10],
+    ['Singapour', '65', 8, 8],
+    ['Indonésie', '62', 8, 12],
+    ['Philippines', '63', 9, 10],
+    ['Brunei', '673', 7, 7],
+    ['Timor oriental', '670', 7, 8],
+    ['Chine', '86', 10, 11],
+    ['Hong Kong', '852', 8, 8],
+    ['Macao', '853', 8, 8],
+    ['Taïwan', '886', 8, 9],
+    ['Corée du Sud', '82', 8, 10],
+    ['Corée du Nord', '850', 7, 10],
+    ['Japon', '81', 9, 10],
+    ['Mongolie', '976', 7, 8],
+    ['Ouzbékistan', '998', 9, 9],
+    ['Turkménistan', '993', 8, 8],
+    ['Tadjikistan', '992', 9, 9],
+    ['Kirghizistan', '996', 9, 9],
+    ['Azerbaïdjan', '994', 9, 9],
+    ['Géorgie', '995', 9, 9],
+    ['Arménie', '374', 8, 8],
+    ['Égypte', '20', 9, 10],
+    ['Maroc', '212', 9, 9],
+    ['Algérie', '213', 9, 9],
+    ['Tunisie', '216', 8, 8],
+    ['Libye', '218', 9, 10],
+    ['Gambie', '220', 7, 7],
+    ['Sénégal', '221', 9, 9],
+    ['Mauritanie', '222', 8, 8],
+    ['Mali', '223', 8, 8],
+    ['Guinée', '224', 8, 9],
+    ["Côte d'Ivoire", '225', 8, 10],
+    ['Burkina Faso', '226', 8, 8],
+    ['Niger', '227', 8, 8],
+    ['Togo', '228', 8, 8],
+    ['Bénin', '229', 8, 8],
+    ['Maurice', '230', 7, 8],
+    ['Liberia', '231', 7, 9],
+    ['Sierra Leone', '232', 8, 8],
+    ['Ghana', '233', 9, 9],
+    ['Nigeria', '234', 7, 10],
+    ['Tchad', '235', 8, 8],
+    ['République centrafricaine', '236', 8, 8],
+    ['Cameroun', '237', 8, 9],
+    ['Cap-Vert', '238', 7, 7],
+    ['Sao Tomé-et-Principe', '239', 7, 7],
+    ['Guinée équatoriale', '240', 6, 9],
+    ['Gabon', '241', 6, 9],
+    ['Congo-Brazzaville', '242', 9, 9],
+    ['Congo-Kinshasa (RDC)', '243', 8, 9],
+    ['Angola', '244', 9, 9],
+    ['Guinée-Bissau', '245', 7, 7],
+    ['Seychelles', '248', 6, 7],
+    ['Soudan', '249', 9, 9],
+    ['Rwanda', '250', 9, 9],
+    ['Éthiopie', '251', 9, 9],
+    ['Somalie', '252', 6, 9],
+    ['Djibouti', '253', 6, 8],
+    ['Kenya', '254', 9, 10],
+    ['Tanzanie', '255', 9, 9],
+    ['Ouganda', '256', 9, 9],
+    ['Burundi', '257', 8, 8],
+    ['Mozambique', '258', 9, 9],
+    ['Zambie', '260', 9, 9],
+    ['Madagascar', '261', 9, 9],
+    ['Réunion / Mayotte', '262', 9, 9],
+    ['Zimbabwe', '263', 9, 10],
+    ['Namibie', '264', 8, 9],
+    ['Malawi', '265', 7, 9],
+    ['Lesotho', '266', 8, 8],
+    ['Botswana', '267', 7, 8],
+    ['Eswatini', '268', 7, 8],
+    ['Comores', '269', 7, 7],
+    ['Afrique du Sud', '27', 9, 9],
+    ['Érythrée', '291', 7, 7],
+    ['Sud-Soudan', '211', 9, 9],
+    ['Australie', '61', 9, 9],
+    ['Nouvelle-Zélande', '64', 8, 10],
+    ['Fidji', '679', 7, 7],
+    ['Papouasie-Nouvelle-Guinée', '675', 7, 8],
+    ['Tonga', '676', 5, 7],
+    ['Îles Salomon', '677', 5, 7],
+    ['Vanuatu', '678', 5, 7],
+    ['Palaos', '680', 7, 7],
+    ['Îles Cook', '682', 5, 5],
+    ['Niue', '683', 4, 4],
+    ['Samoa', '685', 5, 7],
+    ['Kiribati', '686', 5, 8],
+    ['Nouvelle-Calédonie', '687', 6, 6],
+    ['Tuvalu', '688', 5, 6],
+    ['Polynésie française', '689', 6, 8],
+    ['Tokelau', '690', 4, 5],
+    ['Micronésie', '691', 7, 7],
+    ['Îles Marshall', '692', 7, 7],
+    ['Nauru', '674', 7, 7],
+    ['Mexique', '52', 10, 10],
+    ['Guatemala', '502', 8, 8],
+    ['Salvador', '503', 8, 8],
+    ['Honduras', '504', 8, 8],
+    ['Nicaragua', '505', 8, 8],
+    ['Costa Rica', '506', 8, 8],
+    ['Panama', '507', 7, 8],
+    ['Haïti', '509', 8, 8],
+    ['Pérou', '51', 9, 9],
+    ['Argentine', '54', 10, 11],
+    ['Brésil', '55', 10, 11],
+    ['Chili', '56', 9, 9],
+    ['Colombie', '57', 10, 10],
+    ['Venezuela', '58', 10, 10],
+    ['Bolivie', '591', 8, 8],
+    ['Guyana', '592', 7, 7],
+    ['Équateur', '593', 8, 9],
+    ['Guyane française', '594', 9, 9],
+    ['Paraguay', '595', 9, 9],
+    ['Martinique', '596', 9, 9],
+    ['Suriname', '597', 6, 7],
+    ['Uruguay', '598', 8, 8],
+    ['Curaçao', '599', 7, 8],
+    ['Belize', '501', 7, 7],
+    ['Cuba', '53', 8, 8],
+    ['Guadeloupe', '590', 9, 9],
+    ['Jamaïque', '1876', 7, 7]
+  ];
+
+  function populatePhoneCodes(){
+    var select = document.getElementById('tel-code');
+    if (!select) return;
+    PHONE_COUNTRIES.forEach(function(c, i){
+      var opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = c[0] + ' +' + c[1];
+      if (c[0] === 'France') opt.selected = true;
+      select.appendChild(opt);
+    });
+  }
+  populatePhoneCodes();
+
+  function isPhoneValid(){
+    var select = document.getElementById('tel-code');
+    var tel = document.getElementById('tel');
+    var entry = PHONE_COUNTRIES[Number(select.value)];
+    if (!entry) return false;
+    var digits = tel.value.replace(/\D/g, '');
+    return digits.length >= entry[2] && digits.length <= entry[3];
+  }
+
+  document.getElementById('tel').addEventListener('input', function(){
+    this.classList.remove('invalid');
+    var note = document.querySelector('#teaser-form .form-note');
+    if (note) note.hidden = true;
+  });
+
   var WEBHOOK_URL = 'https://hook.eu1.make.com/2jqw26z1crrps7t71r7ff2itrnmjmxeb';
 
   document.getElementById('teaser-form').addEventListener('submit', function(e){
@@ -445,12 +666,28 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
     var lang = document.documentElement.lang || 'fr';
     var btn = form.querySelector('button[type="submit"]');
     var note = form.querySelector('.form-note');
+    var telInput = form.querySelector('#tel');
+
+    if (!isPhoneValid()){
+      telInput.classList.add('invalid');
+      if (note){
+        note.textContent = translations[lang].phone_invalid;
+        note.hidden = false;
+      }
+      telInput.focus();
+      return;
+    }
+    telInput.classList.remove('invalid');
+    if (note) note.hidden = true;
+
+    var countryEntry = PHONE_COUNTRIES[Number(form.querySelector('#tel-code').value)];
     var payload = {
       prenom: form.querySelector('#prenom').value,
       nom: form.querySelector('#nom').value,
       email: form.querySelector('#email').value,
-      indicatif: form.querySelector('#tel-code').value,
-      telephone: form.querySelector('#tel').value,
+      indicatif: '+' + countryEntry[1],
+      pays: countryEntry[0],
+      telephone: telInput.value,
       langue: lang,
       page: window.location.href,
       date: new Date().toISOString()
