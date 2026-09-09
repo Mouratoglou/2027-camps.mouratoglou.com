@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merci - Mouratoglou Academy</title>
+<style>
+  @font-face{ font-family:'Beni M'; font-weight:700; font-style:normal; font-display:swap; src:url('Beni M/BeniM-Bold.otf') format('opentype'); }
+  @font-face{ font-family:'Geometria'; font-weight:400; font-style:normal; font-display:swap; src:url('Geometria/Geometria-Regular.otf') format('opentype'); }
+
+  :root{
+    --ground: #050d18;
+    --ink: #eef3fa;
+    --ink-soft: #93a8c2;
+    --clay: #1f92f0;
+  }
+
+  *{ box-sizing:border-box; }
+  html, body{ height:100%; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 520px at 50% -8%, color-mix(in srgb, white 16%, transparent), transparent 72%),
+      var(--ground);
+    color:var(--ink);
+    font-family:'Geometria', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:32px;
+  }
+  img.logo{
+    height:clamp(44px,6.5vw,62px); width:auto;
+    margin-bottom:clamp(28px,6vw,48px);
+  }
+  h1{
+    font-family:'Beni M', Georgia, serif;
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:clamp(2rem,6vw,3.2rem);
+    margin:0;
+    letter-spacing:-.01em;
+  }
+  h1 em{ font-style:normal; color:var(--clay); }
+  p{
+    margin:18px 0 0;
+    font-size:1.05rem;
+    line-height:1.6;
+    color:var(--ink-soft);
+    max-width:34ch;
+  }
+  a.back{
+    margin-top:36px;
+    font-family:'Geometria', sans-serif;
+    font-size:.82rem;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  a.back:hover{ color:var(--ink); border-color:var(--ink); }
+  a.back:focus-visible{ outline:2px solid var(--clay); outline-offset:3px; }
+</style>
+</head>
+<body>
+  <img class="logo" src="Logo/Logo MA I French Riviera - Horizontal - White-trimmed.png" alt="Mouratoglou Academy - French Riviera">
+  <h1 id="title">Merci<em>.</em></h1>
+  <p id="message">Vous êtes bien inscrit·e. Vous serez parmi les premiers informés dès l'ouverture des réservations.</p>
+  <a class="back" id="back-link" href="./">Retour à l'accueil</a>
+
+  <script>
+    var translations = {
+      fr: {
+        title: 'Merci<em>.</em>',
+        message: "Vous êtes bien inscrit·e. Vous serez parmi les premiers informés dès l'ouverture des réservations.",
+        back: 'Retour à l’accueil'
+      },
+      en: {
+        title: 'Thank you<em>.</em>',
+        message: "You're all set. You'll be among the first to know as soon as reservations open.",
+        back: 'Back to home'
+      },
+      it: {
+        title: 'Grazie<em>.</em>',
+        message: "Sei registrato/a. Sarai tra i primi a saperlo non appena le prenotazioni saranno aperte.",
+        back: 'Torna alla home'
+      }
+    };
+    var params = new URLSearchParams(window.location.search);
+    var lang = params.get('lang');
+    if (!lang || !translations[lang]){
+      try { lang = localStorage.getItem('ma-lang') || 'fr'; } catch(e) { lang = 'fr'; }
+    }
+    if (!translations[lang]) lang = 'fr';
+    document.documentElement.lang = lang;
+    var dict = translations[lang];
+    document.getElementById('title').innerHTML = dict.title;
+    document.getElementById('message').textContent = dict.message;
+    document.getElementById('back-link').textContent = dict.back;
+    document.getElementById('back-link').href = './' + (lang !== 'fr' ? '?lang=' + lang : '');
+  </script>
+</body>
+</html>
