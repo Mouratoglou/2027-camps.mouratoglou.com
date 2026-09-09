@@ -141,22 +141,22 @@
   }
 
   .countdown{
-    margin-bottom:16px; display:flex; flex-direction:column; align-items:center;
+    margin-top:18px; display:flex; flex-direction:column; align-items:center;
   }
-  .countdown-grid{ display:flex; align-items:stretch; transform-origin:center; }
+  .countdown-grid{ display:flex; align-items:stretch; }
   .countdown-cell{
-    display:flex; flex-direction:column; align-items:center; gap:6px;
-    padding:0 clamp(14px,3.5vw,26px);
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    padding:0 clamp(10px,2.6vw,18px);
   }
   .countdown-cell + .countdown-cell{ border-left:1px solid var(--line-on-ground); }
   .countdown-num{
     font-family:'Geometria', sans-serif; font-weight:700;
-    font-size:clamp(1.6rem,4.4vw,2.5rem); line-height:1;
+    font-size:clamp(1.1rem,3vw,1.6rem); line-height:1;
     color:var(--ink-on-ground); font-variant-numeric:tabular-nums;
-    -webkit-text-stroke:1px var(--ink-on-ground);
+    -webkit-text-stroke:.6px var(--ink-on-ground);
   }
   .countdown-unit{
-    font-family:'Geometria', sans-serif; font-weight:700; font-size:.6rem; letter-spacing:.1em;
+    font-family:'Geometria', sans-serif; font-weight:700; font-size:.54rem; letter-spacing:.08em;
     text-transform:uppercase; color:var(--ink-on-ground);
   }
   .btn{
@@ -260,7 +260,8 @@
 
 <main id="top">
   <div class="wrap teaser">
-    <div class="countdown reveal reveal-1">
+    <h1 class="reveal reveal-1">Find it. Build it. <em>Prove it.</em></h1>
+    <div class="countdown reveal reveal-2">
       <div class="countdown-grid">
         <div class="countdown-cell">
           <span class="countdown-num" id="cd-days">00</span>
@@ -280,7 +281,6 @@
         </div>
       </div>
     </div>
-    <h1 class="reveal reveal-2">Find it. Build it. <em>Prove it.</em></h1>
 
     <p class="lead reveal reveal-4" data-i18n="lead">SUR LES COURTS DE BIOT, au cœur de la French Riviera, une nouvelle génération de stages Mouratoglou prend forme.
 
@@ -376,22 +376,7 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
     }
   };
 
-  function matchWidthToH1(el){
-    var h1 = document.querySelector('.teaser h1');
-    if (!el || !h1) return;
-    el.style.transform = 'scaleX(1)';
-    var h1Width = h1.getBoundingClientRect().width;
-    var elWidth = el.getBoundingClientRect().width;
-    if (elWidth > 0){
-      el.style.transform = 'scaleX(' + (h1Width / elWidth) + ')';
-    }
-  }
-
-  function matchCountdownWidth(){
-    matchWidthToH1(document.querySelector('.countdown-grid'));
-  }
-
-  function setLanguage(lang){
+  function setLanguage(lang, updateUrl){
     var dict = translations[lang];
     if (!dict) return;
     document.documentElement.lang = lang;
@@ -403,25 +388,32 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
     try { localStorage.setItem('ma-lang', lang); } catch(e) {}
-    matchCountdownWidth();
+
+    if (updateUrl){
+      var url = new URL(window.location.href);
+      if (lang === 'fr'){
+        url.searchParams.delete('lang');
+      } else {
+        url.searchParams.set('lang', lang);
+      }
+      history.pushState({ lang: lang }, '', url);
+    }
   }
 
   document.querySelectorAll('.lang-switch button').forEach(function(btn){
-    btn.addEventListener('click', function(){ setLanguage(btn.getAttribute('data-lang')); });
+    btn.addEventListener('click', function(){ setLanguage(btn.getAttribute('data-lang'), true); });
   });
 
-  var savedLang = 'fr';
-  try { savedLang = localStorage.getItem('ma-lang') || 'fr'; } catch(e) {}
-  setLanguage(savedLang);
-
-  var countdownResizeTimer;
-  window.addEventListener('resize', function(){
-    clearTimeout(countdownResizeTimer);
-    countdownResizeTimer = setTimeout(matchCountdownWidth, 100);
+  window.addEventListener('popstate', function(e){
+    var lang = (e.state && e.state.lang) || new URL(window.location.href).searchParams.get('lang') || 'fr';
+    setLanguage(lang, false);
   });
-  if (document.fonts && document.fonts.ready){
-    document.fonts.ready.then(matchCountdownWidth);
+
+  var initialLang = new URL(window.location.href).searchParams.get('lang');
+  if (!initialLang || !translations[initialLang]){
+    try { initialLang = localStorage.getItem('ma-lang') || 'fr'; } catch(e) { initialLang = 'fr'; }
   }
+  setLanguage(initialLang, false);
 
   document.getElementById('teaser-form').addEventListener('submit', function(e){
     e.preventDefault();
