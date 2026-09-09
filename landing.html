@@ -237,8 +237,6 @@
     flex-shrink:0; width:18px; height:18px; margin:.15em 0 0; accent-color:var(--clay); cursor:pointer;
   }
   .consent span{ font-size:.84rem; line-height:1.45; color:var(--ink-soft); }
-  .consent.invalid input{ outline:2px solid #e5484d; outline-offset:2px; }
-  .consent.invalid span{ color:#e5484d; }
   .form-card .btn{ width:100%; margin-top:10px; }
   .form-note{ margin:10px 0 0; font-size:.8rem; color:var(--gold); text-align:center; }
 
@@ -346,7 +344,7 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
         </div>
       </div>
       <label class="consent">
-        <input type="checkbox" id="consent" required>
+        <input type="checkbox" id="consent">
         <span data-i18n="consent">J'accepte d'être appelé concernant l'avant-première des nouveaux stages</span>
       </label>
       <button class="btn btn-primary" type="submit" data-i18n="submit">Je veux être informé en premier</button>
@@ -384,7 +382,6 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       submitted: "Merci, vous serez parmi les premiers informés.",
       submit_error: "Une erreur est survenue, réessayez.",
       phone_invalid: "Numéro de téléphone invalide pour l'indicatif sélectionné.",
-      consent_required: "Merci de cocher la case pour continuer.",
       privacy: "Politique de confidentialité",
       legal: "Mentions légales"
     },
@@ -403,7 +400,6 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       submitted: "Thank you, you will be among the first to know.",
       submit_error: "Something went wrong, please try again.",
       phone_invalid: "Invalid phone number for the selected country code.",
-      consent_required: "Please check the box to continue.",
       privacy: "Privacy Policy",
       legal: "Legal Information"
     },
@@ -422,7 +418,6 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       submitted: "Grazie, sarete tra i primi a saperlo.",
       submit_error: "Si è verificato un errore, riprova.",
       phone_invalid: "Numero di telefono non valido per l'indicativo selezionato.",
-      consent_required: "Spunta la casella per continuare.",
       privacy: "Informativa sulla privacy",
       legal: "Note legali"
     }
@@ -712,12 +707,6 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
     if (note) note.hidden = true;
   });
 
-  document.getElementById('consent').addEventListener('change', function(){
-    this.closest('.consent').classList.remove('invalid');
-    var note = document.querySelector('#teaser-form .form-note');
-    if (note) note.hidden = true;
-  });
-
   var WEBHOOK_URL = 'https://hook.eu1.make.com/2jqw26z1crrps7t71r7ff2itrnmjmxeb';
 
   document.getElementById('teaser-form').addEventListener('submit', function(e){
@@ -728,18 +717,6 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
     var note = form.querySelector('.form-note');
     var telInput = form.querySelector('#tel');
     var consentInput = form.querySelector('#consent');
-
-    if (!consentInput.checked){
-      consentInput.closest('.consent').classList.add('invalid');
-      if (note){
-        note.textContent = translations[lang].consent_required;
-        note.hidden = false;
-      }
-      consentInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      consentInput.focus();
-      return;
-    }
-    consentInput.closest('.consent').classList.remove('invalid');
 
     if (!isPhoneValid()){
       telInput.classList.add('invalid');
@@ -762,6 +739,7 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
       indicatif: '+' + countryEntry[2],
       pays: countryEntry[0],
       telephone: telInput.value,
+      consentement: consentInput.checked,
       langue: lang,
       page: window.location.href,
       date: new Date().toISOString()
