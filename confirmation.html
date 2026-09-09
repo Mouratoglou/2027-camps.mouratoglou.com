@@ -77,20 +77,6 @@
     max-width:34ch;
   }
 
-  a.back{
-    margin-top:40px;
-    display:inline-flex; align-items:center; gap:.5em;
-    font-family:'Geometria', sans-serif; font-weight:700;
-    font-size:.95rem;
-    color:var(--ink);
-    text-decoration:none;
-    padding:.95em 1.8em;
-    border:1px solid var(--line);
-    border-radius:2px;
-    transition:border-color .15s ease, background .15s ease;
-  }
-  a.back:hover{ border-color:var(--clay); background:rgba(31,146,240,.08); }
-  a.back:focus-visible{ outline:2px solid var(--clay); outline-offset:3px; }
 
   @media (prefers-reduced-motion:no-preference){
     .reveal{ animation:rise .7s cubic-bezier(.2,.8,.2,1) both; }
@@ -104,7 +90,6 @@
   @media (max-width:480px){
     h1{ font-size:3.1rem; }
     p{ font-size:1rem; }
-    a.back{ font-size:1rem; }
   }
 </style>
 </head>
@@ -118,25 +103,21 @@
     </div>
     <h1 id="title" class="reveal reveal-3">Merci<em>.</em></h1>
     <p id="message" class="reveal reveal-3">Vous êtes bien inscrit·e. Vous serez parmi les premiers informés dès l'ouverture des réservations.</p>
-    <a class="back reveal reveal-4" id="back-link" href="./">Retour à l'accueil</a>
   </div>
 
   <script>
     var translations = {
       fr: {
         title: 'Merci<em>.</em>',
-        message: "Vous êtes bien inscrit·e. Vous serez parmi les premiers informés dès l'ouverture des réservations.",
-        back: 'Retour à l’accueil'
+        message: "Vous êtes bien inscrit·e. Vous serez parmi les premiers informés dès l'ouverture des réservations."
       },
       en: {
         title: 'Thank you<em>.</em>',
-        message: "You're all set. You'll be among the first to know as soon as reservations open.",
-        back: 'Back to home'
+        message: "You're all set. You'll be among the first to know as soon as reservations open."
       },
       it: {
         title: 'Grazie<em>.</em>',
-        message: "Sei registrato/a. Sarai tra i primi a saperlo non appena le prenotazioni saranno aperte.",
-        back: 'Torna alla home'
+        message: "Sei registrato/a. Sarai tra i primi a saperlo non appena le prenotazioni saranno aperte."
       }
     };
     var params = new URLSearchParams(window.location.search);
@@ -149,8 +130,6 @@
     var dict = translations[lang];
     document.getElementById('title').innerHTML = dict.title;
     document.getElementById('message').textContent = dict.message;
-    document.getElementById('back-link').textContent = dict.back;
-    document.getElementById('back-link').href = './' + (lang !== 'fr' ? '?lang=' + lang : '');
   </script>
 </body>
 </html>
