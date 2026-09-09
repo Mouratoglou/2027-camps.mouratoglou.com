@@ -267,7 +267,7 @@
 
   @media (max-width:480px){
     .teaser h1{ font-size:2.7rem; }
-    .teaser .lead{ font-size:1rem; letter-spacing:.01em; }
+    .teaser .lead{ font-size:.72rem; letter-spacing:.01em; }
     .countdown-num{ font-size:1.9rem; }
     .countdown-unit{ font-size:.66rem; }
     .field label{ font-size:.9rem; }
@@ -276,6 +276,7 @@
     .btn{ font-size:1.02rem; }
     .form-note{ font-size:.86rem; }
     .phone-row select{ flex-basis:6.2em; width:6.2em; }
+    .lang-switch button:not(.active){ display:none; }
   }
 </style>
 </head>
@@ -459,8 +460,16 @@ Soyez parmi les premiers informés, et les premiers à réserver votre place.</p
     }
   }
 
+  var langOrder = ['fr', 'en', 'it'];
   document.querySelectorAll('.lang-switch button').forEach(function(btn){
-    btn.addEventListener('click', function(){ setLanguage(btn.getAttribute('data-lang'), true); });
+    btn.addEventListener('click', function(){
+      var target = btn.getAttribute('data-lang');
+      if (btn.classList.contains('active')){
+        var idx = langOrder.indexOf(target);
+        target = langOrder[(idx + 1) % langOrder.length];
+      }
+      setLanguage(target, true);
+    });
   });
 
   window.addEventListener('popstate', function(e){
